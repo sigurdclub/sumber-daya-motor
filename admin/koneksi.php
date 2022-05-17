@@ -6,7 +6,7 @@ function Koneksi()//koneksi ke database
   $nameServer = "localhost";
   $username = "root";
   $password = "";
-  $dbName = "kain_db";
+  $dbName = "dayamotor_db";
 
   $conn = mysqli_connect($nameServer, $username, $password, $dbName);
   
@@ -32,7 +32,7 @@ function tambahAdmin($data)
   $username=$data["username"];
   $password=$data["password"];
   
-  $query="INSERT INTO admin VALUES ('','$username', '$password')";
+  $query="INSERT INTO admin_motor VALUES ('','$username', '$password')";
   mysqli_query($koneksi,$query);//jalankan query
   return $query;
 
@@ -45,7 +45,7 @@ function updateAdmin($data)
   $nama=mysqli_real_escape_string($koneksi, $data["username"]);
   $pwd=mysqli_real_escape_string($koneksi, $data["password"]);
  
-  $query="UPDATE admin SET username='$nama',password='$pwd'WHERE id=$id ";
+  $query="UPDATE admin_motor SET username='$nama',password='$pwd' WHERE id=$id ";
 // var_dump($query);die;
   
   mysqli_query($koneksi,$query) or die(mysqli_error($koneksi));
@@ -57,7 +57,7 @@ function hapusAdmin($id)
   $koneksi = Koneksi();
   $id = htmlspecialchars($_GET["id"]);
  
-  $query = "DELETE FROM admin WHERE id=$id ";
+  $query = "DELETE FROM admin_motor WHERE id=$id ";
   // var_dump($query);die;
   mysqli_query($koneksi,$query) or die(mysqli_error($koneksi));
   return mysqli_affected_rows($koneksi);
@@ -69,10 +69,16 @@ function tambahstok($data)
 {
   $koneksi = Koneksi();
 
-  $namaBarang=$data["nama_kain"];
-  $sat=$data["satuan"];
-  
-  $query="INSERT INTO stok_kain VALUES ('','$namaBarang','', '$sat')";
+  $namaBarang=$data["merek"];
+  $tipe=$data["tipe"];
+  $stok=$data["stok"];
+  $sat=$data["sat"];
+  $file_name      = $_FILES['gambar']['name'];
+  $file_tmp_name  = $_FILES['gambar']['tmp_name'];
+
+    move_uploaded_file($file_tmp_name,'../foto/'.$file_name );
+
+  $query="INSERT INTO stok_motor VALUES ('','$namaBarang','$tipe','$stok', '$sat', '$file_name')";
   mysqli_query($koneksi,$query);//jalankan query
   return $query;
 
@@ -84,7 +90,7 @@ function hapus($id)
   $koneksi = Koneksi();
   $id = htmlspecialchars($_GET["id"]);
  
-  $query = "DELETE FROM stok_kain WHERE idkain=$id ";
+  $query = "DELETE FROM stok_motor WHERE id_motor=$id ";
   // var_dump($query);die;
   mysqli_query($koneksi,$query) or die(mysqli_error($koneksi));
   return mysqli_affected_rows($koneksi);
@@ -95,14 +101,17 @@ function hapus($id)
 function update($data)
 {
   $koneksi = Koneksi();
-  $id=mysqli_real_escape_string($koneksi, $_POST["idkain"]);
-  $nama=mysqli_real_escape_string($koneksi, $data["nama_kain"]);
+  $id=mysqli_real_escape_string($koneksi, $_POST["id_motor"]);
+  $nama=mysqli_real_escape_string($koneksi, $data["merek_motor"]);
+  $tipe=mysqli_real_escape_string($koneksi, $data["tipe"]);
   $stok=mysqli_real_escape_string($koneksi, $data["stok"]);
   $sat=mysqli_real_escape_string($koneksi, $data["satuan"]);
- 
-  
-  $query="UPDATE stok_kain SET nama_kain='$nama',stok='$stok', satuan='$sat' 
-                            WHERE idkain=$id ";
+  $file_name      = $_FILES['gambar']['name'];
+  $file_tmp_name  = $_FILES['gambar']['tmp_name'];
+    move_uploaded_file($file_tmp_name,'../foto/'.$file_name );
+
+  $query="UPDATE stok_motor SET merek_motor='$nama', tipe='$tipe',stok='$stok', satuan='$sat',gambar='$file_name' 
+                            WHERE id_motor=$id ";
 // var_dump($query);die;
   
   mysqli_query($koneksi,$query) or die(mysqli_error($koneksi));
@@ -115,12 +124,13 @@ function barangMasuk($data)
 {
   $koneksi = Koneksi();
 
-  $barang = mysqli_real_escape_string($koneksi, $data["nama_kain"]);
+  $motor = mysqli_real_escape_string($koneksi, $data["merek_motor"]);
+  $tipe = mysqli_real_escape_string($koneksi, $data["tipe"]);
   $jlh = mysqli_real_escape_string($koneksi, $data["jlh"]);
   $penerima = mysqli_real_escape_string($koneksi, $data["penerima"]);
 
   //cek stock yang sekarang
-   $cekstokskrg = mysqli_query($koneksi,"SELECT * FROM stok_kain WHERE idkain='$barang'");
+   $cekstokskrg = mysqli_query($koneksi,"SELECT * FROM stok_motor WHERE id_motor='$motor'");
    $ambildata= mysqli_fetch_array($cekstokskrg);
 
    //ambil datanya stock dri variabel ambildata lalu simpan ke var stockskrg 
@@ -128,9 +138,9 @@ function barangMasuk($data)
    //tambahkan stok skrg dgn qty
    $tambahstock= $stockskrg + $jlh;
    //  query tambah barang masuk
-   mysqli_query($koneksi,"INSERT INTO stok_masuk (id,idkain, jumlah, penerima) VALUES ('','$barang','$jlh','$penerima')");
+   mysqli_query($koneksi,"INSERT INTO motor_masuk (id,id_motor,tipe, jumlah, penerima) VALUES ('','$motor','$tipe','$jlh','$penerima')");
    // ubah data ditabel stock dgn data yg baru ditambah
-   mysqli_query($koneksi,"UPDATE stok_kain SET stok ='$tambahstock' WHERE idkain= '$barang' ");
+   mysqli_query($koneksi,"UPDATE stok_motor SET stok ='$tambahstock' WHERE id_motor= '$motor' ");
    
    return mysqli_affected_rows($koneksi);
 }
@@ -140,16 +150,17 @@ function barangMasuk($data)
 function updateMasuk($data)
 {
   $koneksi = Koneksi();
-   $idb= mysqli_real_escape_string($koneksi, $_POST["idkain"]);
+   $idb= mysqli_real_escape_string($koneksi, $_POST["id_motor"]);
    $idm= mysqli_real_escape_string($koneksi, $_POST["idm"]);
+   $tipe= mysqli_real_escape_string($koneksi, $data["tipe"]);
    $jlh= mysqli_real_escape_string($koneksi, $data["jlh"]);
    $penerima= mysqli_real_escape_string($koneksi, $data["penerima"]);
 
-   $lihatstock = mysqli_query($koneksi,"SELECT * FROM stok_kain WHERE idkain='$idb'");
+   $lihatstock = mysqli_query($koneksi,"SELECT * FROM stok_motor WHERE id_motor='$idb'");
    $stocknya=mysqli_fetch_assoc($lihatstock);
    $stokskrg= $stocknya["stok"];
 
-   $qtyskrg= mysqli_query($koneksi,"SELECT * FROM stok_masuk WHERE id='$idm'");
+   $qtyskrg= mysqli_query($koneksi,"SELECT * FROM motor_masuk WHERE id='$idm'");
    $qtynya= mysqli_fetch_assoc($qtyskrg);
    $qtyskrg= $qtynya["jumlah"];
 
@@ -158,17 +169,17 @@ function updateMasuk($data)
       $tambahin = $stokskrg + $selisih;
 
       //update stok di tabel stok barang
-      mysqli_query($koneksi,"UPDATE stok_kain SET stok='$tambahin' WHERE idkain='$idb'");
+      mysqli_query($koneksi,"UPDATE stok_motor SET stok='$tambahin' WHERE id_motor='$idb'");
       //update data di tabel stok masuk
-      mysqli_query($koneksi,"UPDATE stok_masuk SET jumlah='$jlh', penerima='$penerima' WHERE id='$idm'");
+      mysqli_query($koneksi,"UPDATE motor_masuk SET tipe='$tipe', jumlah='$jlh', penerima='$penerima' WHERE id='$idm'");
  
    }else{
       $selisih= $qtyskrg - $jlh;
       $kurangin = $stokskrg - $selisih;
       //update stok di tabel stok barang
-      mysqli_query($koneksi,"UPDATE stok_kain SET stok='$kurangin' WHERE idkain='$idb'");
+      mysqli_query($koneksi,"UPDATE stok_motor SET stok='$kurangin' WHERE id_motor='$idb'");
       //update data di tabel stok masuk
-      mysqli_query($koneksi,"UPDATE stok_masuk SET jumlah='$jlh', penerima='$penerima'WHERE id='$idm'");
+      mysqli_query($koneksi,"UPDATE motor_masuk SET tipe='$tipe', jumlah='$jlh', penerima='$penerima' WHERE id='$idm'");
 
    }
    return mysqli_affected_rows($koneksi);
@@ -179,7 +190,7 @@ function hapusMasuk($id)
   $koneksi = Koneksi();
   $id = htmlspecialchars($_GET["id"]);
   
-  mysqli_query($koneksi,"DELETE FROM stok_masuk WHERE id=$id ");
+  mysqli_query($koneksi,"DELETE FROM motor_masuk WHERE id=$id ");
  
   return mysqli_affected_rows($koneksi);
   
@@ -191,12 +202,13 @@ function barangKeluar($data)
 {
   $koneksi = Koneksi();
 
-  $barang = mysqli_real_escape_string($koneksi, $data["nama_kain"]);
+  $motor = mysqli_real_escape_string($koneksi, $data["merek_motor"]);
+  $tipe = mysqli_real_escape_string($koneksi, $data["tipe"]);
   $jlh = mysqli_real_escape_string($koneksi, $data["jlh"]);
-  $sat = mysqli_real_escape_string($koneksi, $data["sat"]);
+  $ket = mysqli_real_escape_string($koneksi, $data["ket"]);
 
   //cek stock yang sekarang
-   $cekstokskrg = mysqli_query($koneksi,"SELECT * FROM stok_kain WHERE idkain='$barang'");
+   $cekstokskrg = mysqli_query($koneksi,"SELECT * FROM stok_motor WHERE id_motor='$motor'");
    $ambildata= mysqli_fetch_array($cekstokskrg);
 
    //ambil datanya stock dri variabel ambildata lalu simpan ke var stockskrg 
@@ -204,9 +216,9 @@ function barangKeluar($data)
    //tambahkan stok skrg dgn qty
    $tambahstock= $stockskrg - $jlh;
    //  query tambah barang masuk
-   mysqli_query($koneksi,"INSERT INTO stok_keluar (id,idkain, jumlah, satuan) VALUES ('','$barang','$jlh','$sat')");
+   mysqli_query($koneksi,"INSERT INTO motor_keluar (id,id_motor, tipe, jumlah, keterangan) VALUES ('','$motor','$tipe','$jlh','$ket')");
    // ubah data ditabel stock dgn data yg baru ditambah
-   mysqli_query($koneksi,"UPDATE stok_kain SET stok ='$tambahstock' WHERE idkain= '$barang' ");
+   mysqli_query($koneksi,"UPDATE stok_motor SET stok ='$tambahstock' WHERE id_motor= '$motor' ");
    
    return mysqli_affected_rows($koneksi);
 }
@@ -215,33 +227,35 @@ function barangKeluar($data)
 function updateKeluar($data)
 {
   $koneksi = Koneksi();
-   $idb= mysqli_real_escape_string($koneksi, $_POST["idkain"]);
+   $id= mysqli_real_escape_string($koneksi, $_POST["id_motor"]);
    $idk= mysqli_real_escape_string($koneksi, $_POST["idk"]);
+   $tipe= mysqli_real_escape_string($koneksi, $data["tipe"]);
    $jlh= mysqli_real_escape_string($koneksi, $data["jlh"]);
-   $ket= mysqli_real_escape_string($koneksi, $data["satuan"]);
+   $ket= mysqli_real_escape_string($koneksi, $data["ket"]);
 
-   $lihatstock = mysqli_query($koneksi,"SELECT * FROM stok_kain WHERE idkain='$idb'");
+   $lihatstock = mysqli_query($koneksi,"SELECT * FROM stok_motor WHERE id_motor='$id'");
    $stocknya=mysqli_fetch_assoc($lihatstock);
    $stokskrg= $stocknya["stok"];
 
-   $qtyskrg= mysqli_query($koneksi,"SELECT * FROM stok_keluar WHERE id='$idk'");
+   $qtyskrg= mysqli_query($koneksi,"SELECT * FROM motor_keluar WHERE id='$idk'");
    $qtynya= mysqli_fetch_assoc($qtyskrg);
    $qtyskrg= $qtynya["jumlah"];
    
    if($jlh > $qtyskrg){
     $selisih= $jlh - $qtyskrg;
     $tambahin = $stokskrg - $selisih;
+    
     //update stok di tabel stok barang
-    mysqli_query($koneksi,"UPDATE stok_kain SET stok='$tambahin' WHERE idkain='$idb'");
+    mysqli_query($koneksi,"UPDATE stok_motor SET stok='$tambahin' WHERE id_motor='$id'");
     //update data di tabel stok masuk
-    mysqli_query($koneksi,"UPDATE stok_keluar SET jumlah='$jlh', satuan='$ket' WHERE id='$idk'");
+    mysqli_query($koneksi,"UPDATE motor_keluar SET tipe='$tipe', jumlah='$jlh', keterangan='$ket' WHERE id='$idk'");
   }else{
     $selisih= $qtyskrg - $jlh;
     $kurangin = $stokskrg + $selisih;
     //update stok di tabel stok barang
-    mysqli_query($koneksi,"UPDATE stok_kain SET stok='$kurangin' WHERE idkain='$idb'");
+    mysqli_query($koneksi,"UPDATE stok_motor SET stok='$kurangin' WHERE id_motor='$id'");
     //update data di tabel stok masuk
-    mysqli_query($koneksi,"UPDATE stok_keluar SET jumlah='$jlh', satuan='$ket' WHERE id='$idk'");
+    mysqli_query($koneksi,"UPDATE motor_keluar SET tipe='$tipe', jumlah='$jlh', keterangan='$ket' WHERE id='$idk'");
   }
    
    return mysqli_affected_rows($koneksi);
@@ -252,7 +266,7 @@ function hapusKeluar($id)
   $koneksi = Koneksi();
   $id = htmlspecialchars($_GET["id"]);
 
-  mysqli_query($koneksi,"DELETE FROM stok_keluar WHERE id=$id ");
+  mysqli_query($koneksi,"DELETE FROM motor_keluar WHERE id=$id ");
  
   return mysqli_affected_rows($koneksi);
   

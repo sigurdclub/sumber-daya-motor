@@ -1,23 +1,31 @@
-<!-- <?php
-// include_once "../koneksi.php";
-// $koneksi = Koneksi();
-// if(isset($_POST['tambah'])){
+<?php
+include_once "../koneksi.php";
+$koneksi = Koneksi();
+$id = $_GET["id"];
+$data=query("SELECT * FROM admin_motor WHERE id='$id' ");
+  
+    foreach($data as $row){
+        $nama= $row["username"];
+        $pwd=$row["password"];
+        
+    }
+if(isset($_POST['update'])){
 
-//     if(barangKeluar($_POST)>0){
-//     echo "
-//         <script>
-//             alert('data berhasil ditambah!');
-//             document.location.href = 'barang_keluar.php';
-//         </script>";
-//   }else{
-//     echo "
-//       <script>
-//           alert('data gagal ditambah!');
-//           document.location.href = 'barang_keluar.php';
-//       </script>";
-//   }
-// }
-?> -->
+    if(updateAdmin($_POST)>0){
+    echo "
+        <script>
+            alert('data berhasil ditambah!');
+            document.location.href = 'kelolah_admin.php';
+        </script>";
+  }else{
+    echo "
+      <script>
+          alert('data gagal ditambah!');
+          document.location.href = 'kelolah_admin.php';
+      </script>";
+  }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -113,9 +121,9 @@
         
         <hr style="margin-top: 10%;"> 
         <li class="nav-item" style="padding: 5px;">
-            <a href="../stock_kain/stock_kain.php" class="nav-link">
+            <a href="../stock_motor/stock_motor.php" class="nav-link">
             <i class="nav-icon fas fa-ellipsis-h"></i>
-            <p>Stock Kain</p>
+            <p>Stock Motor</p>
             </a>
         </li>
         <li class="nav-item" style="padding: 5px;">
@@ -136,6 +144,12 @@
             <p>Kelolah Admin</p>
             </a>
         </li>
+        <li class="nav-item" style="padding: 5px;">
+            <a href="../logout.php" class="nav-link">
+            <i class="nav-icon fas fa-file"></i>
+            <p>Log Out</p>
+            </a>
+        </li>
         </ul>
     </nav>
     <!-- /.sidebar-menu -->
@@ -150,7 +164,7 @@
     <div class="container-fluid">
     
         <div class="">
-            <h1 class="m-0" style="text-align: center; color: black;">Edit Barang Keluar</h1>
+            <h1 class="m-0" style="text-align: center; color: black;">Edit Admin</h1>
         </div>
     
     </div>
@@ -162,26 +176,25 @@
         <div class="row" style="justify-content: center;width: 100%;" >
 <div class="card card-stock-barang" style="width: 50%; background-color: #D9CAB3;">
     <div class="card-body">
-    <form class="row g-3" action="" method="POST" enctype="multipart/form-data">
-    <div class="form-group">
-        <label>Select</label>
-        <select class="form-control" name="nama_kain" required style="background-color: white; color: black;">
-            <option>--Pilih Barang--</option>
-            <option value=""></option>
-        </select>
-    </div>
-    <div class="col-12">
-        <label for="inputAddress2" class="form-label">Jumlah</label>
-        <input type="text" class="form-control" id="inputAddress4" placeholder="0" name="jlh" required style="background-color: white;">
-    </div>
-    <div class="col-12">
-        <label for="inputAddress2" class="form-label">Satuan</label>
-        <input type="text" class="form-control" id="inputAddress3" placeholder="..." name="sat" required style="background-color: white;">
-    </div>
-    <div class="col-12" style="display: flex; justify-content: right;">
-        <button type="submit" class="btn btn-primary" name="tambah">Tambah</button>
-    </div>
-    </form>
+        <form class="row g-3" action="" method="POST" enctype="multipart/form-data">
+            <div class="col-12">
+                <input type="hidden" class="form-control" id="inputAddress" placeholder="" name="id" value="<?php echo $id ?>" >
+            </div>
+            <div class="col-12">
+                <label for="inputAddress" class="form-label">Username</label>
+                <input type="text" class="form-control" id="inputAddress" placeholder="..." name="username"value="<?php echo $nama ?>" >
+            </div>
+            <div class="col-12">
+                <label for="inputAddress" class="form-label">Password</label>
+                <input type="password" class="form-control" id="inputAddress" placeholder="..." name="password"value="<?php echo $pwd ?>" >
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-info" name="update">Update</button>
+                <a href="kelolah_admin.php">
+                    <button type="button" class="btn btn-default float-right">Cancel</button>
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 </div>

@@ -7,13 +7,13 @@ $id = htmlspecialchars($_GET["id"]);
     echo "
             <script>
                alert('data berhasil dihapus!');
-               document.location.href = 'stock_kain.php';
+               document.location.href = 'stock_motor.php';
             </script>";
   }else{
     echo "
             <script>
                alert('data gagal dihapus!');
-               document.location.href = 'stock_kain.php';
+               document.location.href = 'stock_motor.php';
             </script>";
   }
 

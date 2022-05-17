@@ -1,10 +1,10 @@
-<!-- <?php
-// include_once'../koneksi.php';
-// $koneksi = Koneksi();
-// $i=1;
-//     $data=query("SELECT * FROM stok_kain INNER JOIN stok_keluar ON stok_kain.idkain = stok_keluar.idkain 
-//                 ORDER BY id DESC");
-?> -->
+<?php
+include_once'../koneksi.php';
+$koneksi = Koneksi();
+$i=1;
+    $data=query("SELECT * FROM stok_motor INNER JOIN motor_keluar ON stok_motor.id_motor = motor_keluar.id_motor 
+                ORDER BY id DESC");
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -100,9 +100,9 @@
     
     <hr style="margin-top: 10%;"> 
     <li class="nav-item" style="padding: 5px;">
-        <a href="../stock_kain/stock_kain.php" class="nav-link">
+        <a href="../stock_motor/stock_motor.php" class="nav-link">
         <i class="nav-icon fas fa-ellipsis-h"></i>
-        <p >Stock Kain</p>
+        <p >Stock Motor</p>
         </a>
     </li>
     <li class="nav-item" style="padding: 5px;">
@@ -112,7 +112,7 @@
         </a>
     </li>
     <li class="nav-item" style="padding: 5px;">
-        <a href="./barang_keluar.php" class="nav-link">
+        <a href="../barang_keluar/barang_keluar.php" class="nav-link">
         <i class="nav-icon fas fa-file"></i>
         <p>Barang Keluar</p>
         </a>
@@ -121,6 +121,12 @@
         <a href="../kelolah_admin/kelolah_admin.php" class="nav-link">
         <i class="nav-icon fas fa-file"></i>
         <p>Kelolah Admin</p>
+        </a>
+    </li>
+    <li class="nav-item" style="padding: 5px;">
+        <a href="../logout.php" class="nav-link">
+        <i class="nav-icon fas fa-file"></i>
+        <p>Log Out</p>
         </a>
     </li>
     </ul>
@@ -163,29 +169,34 @@
                 <tr>
                 <th scope="col">No</th>
                 <th scope="col">Tanggal</th>
-                <th scope="col">Nama Kain</th>
+                <th scope="col">Merek Motor</th>
+                <th scope="col">Tipe</th>
                 <th scope="col">Jumlah</th>
-                <th scope="col">Satuan</th>
+                <th scope="col">Keterangan</th>
                 <th scope="col">Aksi</th>
                 </tr>
             </thead>
             <tbody style="background-color: #D9CAB3;">
                 
+                <?php foreach($data AS $baris):?>
                     <tr>
-                        <td scope="row">1</td>
-                        <td>1</td>
-                        <td>22</td>
-                        <td>dde</td>
-                        <td>dedo</td>
+                        <td scope="row"><?php echo $i++?></td>
+                        <td><?php echo $baris['tanggal'];?></</td>
+                        <td><?php echo $baris['merek_motor'];?></</td>
+                        <td><?php echo $baris['tipe'];?></td>
+                        <td><?php echo $baris['jumlah'];?></td>
+                        <td><?php echo $baris['keterangan'];?></td>
                         <td style="display: flex; justify-content: space-around;">
-                            <a href="./edit.php?id=">
+                            <a href="./edit.php?id=<?php echo $baris["id"];?>">
                                 <button type="button" class="btn btn-warning">Edit</button>
                             </a>
-                            <a href="./hapus.php?id=">
+                            <a href="./hapus.php?id=<?php echo $baris["id"];?>">
                                 <button type="button" class="btn btn-danger">Hapus</button>
                             </a>
                         </td>
                     </tr>
+                    
+                <?php endforeach; ?>
                     
                 
             </tbody>
